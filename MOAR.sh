@@ -113,12 +113,13 @@ for ref in $(cat ${references}); do
 	${mummerPath}/mummerplot -large -layout -t png out.delta.filter;
 
 	# Changing styles : reducing point size and coloring forward () and reverse ()
-	sed -i 's/set style line 1  lt 1 lw 3 pt 6 ps 1/set style line 1 lc "blue" lt 2 lw 1 pt 6 ps 0.5/g' out.gp
-	sed -i 's/set style line 2  lt 3 lw 3 pt 6 ps 1/set style line 2 lc "red" lt 2 lw 1 pt 6 ps 0.5/g' out.gp
+	sed -i 's/set style line 1  lt 1 lw 3 pt 6 ps 1/set style line 1 lc "blue" lt 2 lw 1 pt 6 ps 0.4/g' out.gp
+	sed -i 's/set style line 2  lt 3 lw 3 pt 6 ps 1/set style line 2 lc "red" lt 2 lw 1 pt 6 ps 0.4/g' out.gp
 	
 	# Replace out.png by out.pdf 
-	sed -i 's/set terminal png tiny size 1400,1400/set terminal pdf size 300,200/g' out.gp
+	sed -i 's/set terminal png tiny size 1400,1400/set terminal pdf size 20,20/g' out.gp
 	sed -i 's/set output "out.png"/set output "out.pdf"/g' out.gp
+	# Remove the grid to avoid having a "black box" with the pdf
 	sed -i 's/set grid//g' out.gp
 	
 	# Finaly print the pdf plot
