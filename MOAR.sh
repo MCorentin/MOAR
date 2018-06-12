@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # To add : 
-#	options for nucmer
+#	Options for nucmer
+#	Remove grid out.gp
 
 threads="10"
 assembly=""
@@ -14,10 +15,10 @@ function usage
 {
 	echo "This script will align an assembly against one or more reference using Mummer:"
 	echo ""
-    echo "USAGE MOAR.sh -r [FASTA_LIST] -t [NBTHREADS] -p [PREFIX] -o [OUTPUTFOLDER]"
+    echo "USAGE MOAR.sh -t [NBTHREADS] -r [FASTA_LIST] -a [ASSEMBLY] -p [PREFIX] -m [MUMMER_PATH] -o [OUTPUTFOLDER]"
     echo "-h print this help message"
+	echo "-t : number of threads to use (default: 10)"
 	echo "-r : a text file containing the list of fasta files to use as a reference (Required)"
-    echo "-t : number of threads to use (default: 10)"
     echo "-a : assembly to align to the reference (Required)"
     echo "-p : output prefix (default: Mummer_)"
 	echo "-m : path to Mummer (required)"
@@ -32,12 +33,12 @@ while getopts r:t:a:p:m:o:h opt; do
 			usage
             exit 1
         ;;
+		t)
+            threads=${OPTARG}
+        ;;
 		r)
 			references=${OPTARG}
 		;;
-        t)
-            threads=${OPTARG}
-        ;;
 		a)
 			assembly=${OPTARG}
 		;;
@@ -87,39 +88,40 @@ if [ ! -d "${outputDir}" ]; then
 	exit 1
 fi
 
-echo "MOAR on `date '+%Y-%m-%d %H:%M:%S'`" > ${outputDir}/Skipped.log
+echo "MOAR on `date '+%Y-%m-%d %H:%M:%S'`" > ${outputDir}/MOAR.log
 
 # Compare the assembly against each file from "references"
 for ref in $(cat ${references}); do
-
+	echo ""
+	
 	if [ ! -r ${ref} ]; then
 		echo "Cannot read ${ref} !!! Skipping..."
 		echo "${ref}" >> ${outputDir}/Skipped.log
 	fi
 
+	# "ref" is  a path, soing the basename allow us to create a folder named after the file only
+	refname=$(basename ${ref})
+	
 	cd "${outputDir}"
-	mkdir "${prefix}_${ref}";
-	cd "${prefix}_${ref}";
+	mkdir "${prefix}_${refname}";
+	cd "${prefix}_${refname}";
 	
 	cmd="${mummerPath}/nucmer --mum -c 500 -t ${threads} ${ref} ${assembly}";
 	echo "Running ${cmd} ...";
 	eval ${cmd}
 	${mummerPath}/delta-filter -1 out.delta > out.delta.filter;
-	${mummerPath}/mummerplot -large -layout --terminal png --prefix ${prefix}_${ref} out.delta.filter;
-	
-	# Changing styles : reducing point size and coloring forward () and reverse ()
-	sed -i 's/set style line 1  lt 1 lw 2 pt 6 ps 1/set style line 1 lc "blue" lt 2 lw 1 pt 6 ps 0.5/g' out.gp
-	sed -i 's/set style line 2  lt 3 lw 2 pt 6 ps 1/set style line 2 lc "red" lt 2 lw 1 pt 6 ps 0.5/g' out.gp
-	
-	# Replace x11 output by pdf 
-	sed -i 's/set terminal x11 font "Courier,8"//g' out.gp
-	sed -i -e '1iset terminal pdf size 200,100\' out.gp
-	sed -i -e '2iset output \'out.pdf\'\' out.gp
+	${mummerPath}/mummerplot -large -layout -t png out.delta.filter;
 
-	# Remove plot interactivity since we plot it as a pdf 
-	head -n -8 out.gp
+	# Changing styles : reducing point size and coloring forward () and reverse ()
+	sed -i 's/set style line 1  lt 1 lw 3 pt 6 ps 1/set style line 1 lc "blue" lt 2 lw 1 pt 6 ps 0.5/g' out.gp
+	sed -i 's/set style line 2  lt 3 lw 3 pt 6 ps 1/set style line 2 lc "red" lt 2 lw 1 pt 6 ps 0.5/g' out.gp
 	
-	# Finaly print the plot
+	# Replace out.png by out.pdf 
+	sed -i 's/set terminal png tiny size 1400,1400/set terminal pdf size 300,200/g' out.gp
+	sed -i 's/set output "out.png"/set output "out.pdf"/g' out.gp
+	sed -i 's/set grid//g' out.gp
+	
+	# Finaly print the pdf plot
 	gnuplot out.gp
 	
 	cd ../;
