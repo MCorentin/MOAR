@@ -1,5 +1,4 @@
-# MOAR
-MOAR (Mummer On Assembly against a Reference)
+# MOAR (Mummer On Assembly against a Reference)
 
 This script will align an assembly against one or more references using Mummer:
 
@@ -13,9 +12,20 @@ USAGE MOAR.sh -t [NBTHREADS] -r [FASTA_LIST] -a [ASSEMBLY] -p [PREFIX] -m [MUMME
 	-m : path to Mummer (required)
 	-o : output directory (default: ./)
 
+
+# Input
+
+The script need
+	A text file with the list of fasta files to use as a reference, one fasta per line
+	An assembly in fasta format
+	The path to where Mummer is installed
+
+MOAR will then run mummer to align the sequences from the assembly against each reference, one by one.
+
+
 # Output
 
-The script will create a folder for each file available in "FASTA_LIST", this folder will contain:
+The script will create a folder for each "reference", this folder will contain:
 
 	The default mummer output:
 
@@ -27,8 +37,8 @@ The script will create a folder for each file available in "FASTA_LIST", this fo
 
 
 # Example 
-This is an output example, the reference is on the x-axis, the scaffolds on the y-axis
-Forward alignments are in blue
-Reverse alignments are in red
+This is an output example, the reference is on the x-axis, the scaffolds on the y-axis.
+Forward alignments are in blue.
+Reverse alignments are in red.
 
 ![alt text](https://raw.githubusercontent.com/MCorentin/MOAR/master/example.png)

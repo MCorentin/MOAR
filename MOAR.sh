@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# To add : 
+# To add :
 #	Options for nucmer
-#	Remove grid out.gp
+#	Update log
+#	Remove sequence with no match from mummer plot
 
 threads="10"
 assembly=""
