@@ -2,6 +2,7 @@
 
 This script will align an assembly against one or more references using Mummer:
 
+```
 USAGE MOAR.sh -t [NBTHREADS] -r [FASTA_LIST] -a [ASSEMBLY] -p [PREFIX] -m [MUMMER_PATH] -o [OUTPUTFOLDER]
 
 	-h : print this help message
@@ -11,14 +12,16 @@ USAGE MOAR.sh -t [NBTHREADS] -r [FASTA_LIST] -a [ASSEMBLY] -p [PREFIX] -m [MUMME
 	-p : output prefix (default: Mummer_)
 	-m : path to Mummer (required)
 	-o : output directory (default: ./)
-
+```
 
 # Input
 
 The script need:
-	A text file with the list of fasta files to use as a reference, one fasta per line
-	An assembly in fasta format
-	The path to where Mummer is installed
+```
+A text file with the list of fasta files to use as a reference, one fasta per line
+An assembly in fasta format
+The path to where Mummer is installed
+```
 
 MOAR will then run mummer to align the sequences from the assembly against each reference, one by one.
 
@@ -26,14 +29,14 @@ MOAR will then run mummer to align the sequences from the assembly against each 
 # Output
 
 The script will create a folder for each "reference", this folder will contain:
+```
+The default mummer output:
+	The delta file from nucmer, containing the alignments
+	A png graph with mummerplot default style
+	A ".gp" file, customisable to change the style of the graph
 
-	The default mummer output:
-		The delta file from nucmer, containing the alignments
-		A png graph with mummerplot default style
-		A ".gp" file, customisable to change the style of the graph
-
-	It also produce a pdf graph with a custom style (see example graph below)
-
+It also produce a pdf graph with a custom style (see example graph below)
+```
 
 # Example 
 This is an output example, the reference is on the x-axis, the scaffolds on the y-axis.
