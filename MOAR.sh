@@ -91,6 +91,7 @@ fi
 
 echo "MOAR on `date '+%Y-%m-%d %H:%M:%S'`" > ${outputDir}/MOAR.log
 
+
 # Compare the assembly against each file from "references"
 for ref in $(cat ${references}); do
 	echo ""
@@ -129,8 +130,12 @@ for ref in $(cat ${references}); do
 	# Remove the grid to avoid having scaffolds names overlapping leadingto a black box on the Y axis
 	sed -i 's/set grid//g' out.gp
 
-	# Finaly print the pdf plot
+	# Finaly print the pdf plot and rename the files
 	gnuplot out.gp
+
+	cp out.gp ${prefix}_${ref}.gp
+	mv out.png ${prefix}_${ref}.png
+	mv out.pdf ${prefix}_${ref}.pdf
 
 	cd ../;
 done
