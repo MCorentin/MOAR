@@ -99,45 +99,45 @@ for ref in $(cat ${references}); do
 	if [ ! -r ${ref} ]; then
 		echo "Cannot read ${ref} !!! Skipping..."
 		echo "${ref}" >> ${outputDir}/Skipped.log
+	else
+		# "ref" is  a path, soing the basename allow us to create a folder named after the file only
+		refname=$(basename ${ref})
+
+		cd "${outputDir}"
+		mkdir "${prefix}_${refname}";
+		cd "${prefix}_${refname}";
+
+		cmd="${mummerPath}/nucmer --mum -c 500 -t ${threads} ${ref} ${assembly}";
+		echo "Running ${cmd} ...";
+		eval ${cmd};
+
+		cmd="${mummerPath}/delta-filter -1 out.delta > out.delta.filter";
+		echo "Running ${cmd} ...";
+			eval ${cmd};
+
+		cmd="${mummerPath}/mummerplot -large -layout -t png out.delta.filter";
+		echo "Running ${cmd} ...";
+		eval ${cmd};
+
+		# Changing styles : reducing point size and coloring forward () and reverse ()
+		sed -i 's/set style line 1  lt 1 lw 3 pt 6 ps 1/set style line 1 lc "blue" lt 2 lw 1 pt 6 ps 0.4/g' out.gp
+		sed -i 's/set style line 2  lt 3 lw 3 pt 6 ps 1/set style line 2 lc "red" lt 2 lw 1 pt 6 ps 0.4/g' out.gp
+
+		# Replace out.png by out.pdf
+		sed -i 's/set terminal png tiny size 1400,1400/set terminal pdf size 20,20/g' out.gp
+		sed -i 's/set output "out.png"/set output "out.pdf"/g' out.gp
+		# Remove the grid to avoid having scaffolds names overlapping leadingto a black box on the Y axis
+		sed -i 's/set grid//g' out.gp
+
+		# Finaly print the pdf plot and rename the files
+		gnuplot out.gp
+
+		cp out.gp ${prefix}_${refname}.gp
+		mv out.png ${prefix}_${refname}.png
+		mv out.pdf ${prefix}_${refname}.pdf
+
+		cd ../;
 	fi
-
-	# "ref" is  a path, soing the basename allow us to create a folder named after the file only
-	refname=$(basename ${ref})
-
-	cd "${outputDir}"
-	mkdir "${prefix}_${refname}";
-	cd "${prefix}_${refname}";
-
-	cmd="${mummerPath}/nucmer --mum -c 500 -t ${threads} ${ref} ${assembly}";
-	echo "Running ${cmd} ...";
-	eval ${cmd};
-
-	cmd="${mummerPath}/delta-filter -1 out.delta > out.delta.filter";
-	echo "Running ${cmd} ...";
-        eval ${cmd};
-
-	cmd="${mummerPath}/mummerplot -large -layout -t png out.delta.filter";
-	echo "Running ${cmd} ...";
-	eval ${cmd};
-
-	# Changing styles : reducing point size and coloring forward () and reverse ()
-	sed -i 's/set style line 1  lt 1 lw 3 pt 6 ps 1/set style line 1 lc "blue" lt 2 lw 1 pt 6 ps 0.4/g' out.gp
-	sed -i 's/set style line 2  lt 3 lw 3 pt 6 ps 1/set style line 2 lc "red" lt 2 lw 1 pt 6 ps 0.4/g' out.gp
-
-	# Replace out.png by out.pdf
-	sed -i 's/set terminal png tiny size 1400,1400/set terminal pdf size 20,20/g' out.gp
-	sed -i 's/set output "out.png"/set output "out.pdf"/g' out.gp
-	# Remove the grid to avoid having scaffolds names overlapping leadingto a black box on the Y axis
-	sed -i 's/set grid//g' out.gp
-
-	# Finaly print the pdf plot and rename the files
-	gnuplot out.gp
-
-	cp out.gp ${prefix}_${ref}.gp
-	mv out.png ${prefix}_${ref}.png
-	mv out.pdf ${prefix}_${ref}.pdf
-
-	cd ../;
 done
 
 echo "Done !"
